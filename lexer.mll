@@ -1,29 +1,26 @@
+(*
+ * Since: Feb 9, 2017
+ *
+ * Lexer for the grammar defined for Parser
+ *)
+
+
 (* ---------------------------------------------------------------------------*)
 (* HEADER SECTION *)
 (* ---------------------------------------------------------------------------*)
 {
-    open Printf
+    open Parser
 }
 
 
 (* ---------------------------------------------------------------------------*)
 (* DEFINITIONS SECTION *)
 (* ---------------------------------------------------------------------------*)
-let ADD         = '+'
-let SUB         = '-'
-let MUL         = '*'
-let DIV         = '/'
+let digit       = ['0'-'9']+
+let alpha       = ['a'-'z''A'-'Z']+
+let str         = "\"[^\"]*\""
 
-let NEG         = "<>"
-let LEQ         = "<="
-let LT          = '<'
-let EQ          = "=="
-
-let DIGIT       = ['0'-'9']+
-let ALPHA       = ['a'-'z''A'-'Z']+
-let STR         = "\"[^\"]*\""
-
-let linereturn  = "\r\n" | "\n\r" | '\n' | '\r'
+let newline     = "\r\n" | "\n\r" | '\n' | '\r'
 let whitespace  = ' '
 let tabulation  = '\t'
 let blank       = tabulation | whitespace
@@ -33,43 +30,31 @@ let blank       = tabulation | whitespace
 (* ---------------------------------------------------------------------------*)
 (* RULES SECTION *)
 (* ---------------------------------------------------------------------------*)
-rule udem_lang = parse 
+rule token = parse 
 
-    (* oper *)
-    | ADD
-    | SUB
-    | MUL
-    | DIV as operator
-        {
-            printf "oper(%c)\n" operator;
-            udem_lang lexbuf
-        }
+    (* operators *)
+    | '+' {ADD;}
+    | '-' {SUB;}
+    | '*' {MUL;}
+    | '/' {DIV;}
+    | '=' {EQ;}
+    | '-' {NEG;}
+    | '<' {LT;}
+    | "<=" {LEQ}
 
-    (* Unknown char *)
-    | _ as c
-        {
-            printf "Unrecognized character: %c\n" c;
-            udem_lang lexbuf
-        }
+    (* digit *)
+    | digit as value {INT_VALUE (int_of_string value)}
+    | newline {NEWLINE}
 
-    (* end of file *)
-    | eof {}
+    (* Special elements / Unrecognized elements*)
+    | blank {token lexbuf}
+    | _ {token lexbuf}
+    | eof {raise End_of_file}
 
 
 
 (* ---------------------------------------------------------------------------*)
 (* TRAILER SECTION *)
 (* ---------------------------------------------------------------------------*)
-{
-    (* Temporary debug *)
-    let main() =
-        let cin = 
-            if Array.length Sys.argv > 1
-                then open_in Sys.argv.(1)
-            else stdin
-        in
-        let lexbuf = Lexing.from_channel cin in
-        udem_lang lexbuf
-        let _ = Printexc.print main()
-}
+{}
 
