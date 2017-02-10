@@ -31,18 +31,19 @@ input:  /* empty */ {}
 ;
 
 line:   NEWLINE {}
-        | exp NEWLINE {}
+        | exp NEWLINE { printf "%d\n" $1; flush stdout}
 ;
 
-exp:    ADD exp exp {$2 + $3}
-        | SUB exp exp {$2 - $3}
-        | MUL exp exp {$2 * $3}
-        | DIV exp exp {$2 / $3}
+exp:    INT_VALUE {$1}
+        | exp ADD exp {$1 + $3}
+        | exp SUB exp {$1 - $3}
+        | exp MUL exp {$1 * $3}
+        | exp DIV exp {$1 / $3}
         | NEG exp {-$2}
         /*
-        | LEQ exp exp {$2 <= $3}
-        | LT exp exp {$2 < $3}
-        | EQ exp exp {$2 = $3}
+        | exp LEQ exp {$1 <= $3}
+        | exp LT exp {$1 < $3}
+        | exp EQ exp {$1 = $3}
         */
 ;
 

@@ -16,8 +16,8 @@
 (* ---------------------------------------------------------------------------*)
 (* DEFINITIONS SECTION *)
 (* ---------------------------------------------------------------------------*)
-let digit       = ['0'-'9']+
-let alpha       = ['a'-'z''A'-'Z']+
+let digit       = ['0'-'9']
+let alpha       = ['a'-'z''A'-'Z']
 let str         = "\"[^\"]*\""
 
 let newline     = "\r\n" | "\n\r" | '\n' | '\r'
@@ -30,23 +30,23 @@ let blank       = tabulation | whitespace
 (* ---------------------------------------------------------------------------*)
 (* RULES SECTION *)
 (* ---------------------------------------------------------------------------*)
-rule token = parse 
+rule token = parse
 
     (* operators *)
-    | '+' {ADD;}
-    | '-' {SUB;}
-    | '*' {MUL;}
-    | '/' {DIV;}
-    | '=' {EQ;}
-    | '-' {NEG;}
-    | '<' {LT;}
+    | '+' {ADD}
+    | '-' {SUB}
+    | '*' {MUL}
+    | '/' {DIV}
+    | '=' {EQ}
+    | '-' {NEG}
+    | '<' {LT}
     | "<=" {LEQ}
 
-    (* digit *)
-    | digit as value {INT_VALUE (int_of_string value)}
-    | newline {NEWLINE}
+    (* values *)
+    | digit+ as value {INT_VALUE (int_of_string value)}
 
     (* Special elements / Unrecognized elements*)
+    | newline {NEWLINE}
     | blank {token lexbuf}
     | _ {token lexbuf}
     | eof {raise End_of_file}

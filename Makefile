@@ -38,3 +38,4 @@ clean:
 	-rm *.cmo *.cmi *.mli
 	-rm lexer.ml
 	-rm parser.ml
+	-rm $(TARGET)
