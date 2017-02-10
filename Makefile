@@ -1,41 +1,33 @@
 # ------------------------------------------------------------------------------
+OCAMLC = ocamlc
+OCAMLY = ocamlyacc
+OCAMLL = ocamllex
+RM = rm
 TARGET = program-launcher
-SOURCE = lexer.mll parser.mly main.ml
-
+OBJS = exp.cmo parser.cmo lexer.cmo main.cmo 
 
 
 # ------------------------------------------------------------------------------
+$(TARGET) : $(OBJS)
+	$(OCAMLC) -o $(TARGET) $^
 
-$(TARGET) : parser.cmo lexer.cmo main.cmo
-	ocamlc -o $(TARGET) parser.cmo lexer.cmo main.cmo
+%.mli: %.mly
+	$(OCAMLY) $<
+%.ml: %.mli
+	$(OCAMLC) -c $<
 
-
-parser.mli: parser.mly
-	ocamlyacc parser.mly
-parser.ml: parser.mli
-	ocamlc -c parser.mli
-parser.cmo: parser.ml
-	ocamlc -c parser.ml
-
-
-lexer.ml: lexer.mll
-	ocamllex lexer.mll
-lexer.cmo: lexer.ml
-	ocamlc -c lexer.ml
-
-
-main.cmo: main.ml
-	ocamlc -c main.ml
-
-
-
-
+%.ml: %.mll
+	$(OCAMLL) $<
+%.cmo: %.ml
+	$(OCAMLC) -c $<
 
 
 # ------------------------------------------------------------------------------
 .PHONY: clean
 clean:
-	-rm *.cmo *.cmi *.mli
-	-rm lexer.ml
-	-rm parser.ml
-	-rm $(TARGET)
+	$(RM) -f *.cmo *.cmi *.mli
+	$(RM) -f *.out
+	$(RM) -f lexer.ml
+	$(RM) -f parser.ml
+	$(RM) -f $(OBJS)
+	$(RM) -f $(TARGET)
