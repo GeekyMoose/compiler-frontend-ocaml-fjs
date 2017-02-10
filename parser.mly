@@ -16,24 +16,26 @@
 /* OCAMLYACC DECLARATIONS */
 /* ---------------------------------------------------------------------------*/
 %token <int> INT_VALUE
-%token ADD SUB MUL DIV NEG LEQ LT EQ
-%token LPAREN RPAREN
-%token NEWLINE
+%token <string> STR_VALUE
+%token PLUS MINUS MULTIPLY DIVIDE LT LEQ EQ
+%token LPAREN RPAREN LBRACET RBRACET
+%token NEWLINE PERIOD
+%token IF ELIF ELSE VAR FUNCTION
 
 %left ADD SUB
 %left MUL DIV
 %left NEG
 
-%start input
-%type <unit> input
+%start body
+%type <unit> body
 
 
 /* ---------------------------------------------------------------------------*/
 /* GRAMMAR RULES (Rules and actions) */
 /* ---------------------------------------------------------------------------*/
 %%
-input:  /* empty */ {}
-        | input line {}
+body:  /* empty */ {}
+        | body line {}
 ;
 
 line:   NEWLINE {}
@@ -42,10 +44,10 @@ line:   NEWLINE {}
 ;
 
 exp:    INT_VALUE {$1}
-        | exp ADD exp {$1 + $3}
-        | exp SUB exp {$1 - $3}
-        | exp MUL exp {$1 * $3}
-        | exp DIV exp {
+        | exp PLUS exp {$1 + $3}
+        | exp MINUS exp {$1 - $3}
+        | exp MULTIPLY exp {$1 * $3}
+        | exp DIVIDE exp {
             if $3 <> 0 then $1 / $3
             else (
                 let pos_start = Parsing.rhs_start_pos 3 in
@@ -55,7 +57,7 @@ exp:    INT_VALUE {$1}
                 1
             )
          }
-        | NEG exp {-$2}
+        | MINUS exp {-$2}
         | LPAREN exp RPAREN {$2}
         /*
         TODO
@@ -70,6 +72,4 @@ exp:    INT_VALUE {$1}
 /* TRAILER */
 /* ---------------------------------------------------------------------------*/
 %%
-
-
 

@@ -43,23 +43,33 @@ let blank       = tabulation | whitespace
 rule token = parse
 
     (* operators *)
-    | '+' {ADD}
-    | '-' {SUB}
-    | '*' {MUL}
-    | '/' {DIV}
-    | '=' {EQ}
-    | '-' {NEG}
+    | '+' {PLUS}
+    | '-' {MINUS}
+    | '*' {MULTIPLY}
+    | '/' {DIVIDE}
     | '<' {LT}
     | "<=" {LEQ}
+    | "==" {EQ}
 
     (* Elements *)
     | '(' {LPAREN}
     | ')' {RPAREN}
+    | '{' {LBRACET}
+    | '}' {RBRACET}
+
+    (* keywords *)
+    | "if" {IF}
+    | "else if" {ELIF}
+    | "else" {ELSE}
+    | "function" {FUNCTION}
+    | "var" {VAR}
 
     (* values *)
     | digit+ as value {INT_VALUE (int_of_string value)}
+    | str as value {STR_VALUE (value)}
 
     (* Special elements / Unrecognized elements*)
+    | '.' {PERIOD}
     | newline {incr_lineno lexbuf; NEWLINE}
     | blank {token lexbuf}
     | _ {token lexbuf}
@@ -70,5 +80,14 @@ rule token = parse
 (* ---------------------------------------------------------------------------*)
 (* TRAILER SECTION *)
 (* ---------------------------------------------------------------------------*)
-{}
+{
+    let rec debug_iter_tokens lexbuf =
+        let tok = token lexbuf in
+        match tok with
+        | PLUS -> print_string "PLUS"; debug_iter_tokens lexbuf
+        | INT_VALUE x -> print_string "INT_VALUE(";print_int x;print_string ")";debug_iter_tokens lexbuf
+        | _ -> print_string "X";;
+}
+
+
 
