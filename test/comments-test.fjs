@@ -1,0 +1,17 @@
+/* After parsing, this file should return anything (Just newlines) */
+/* This is a simple comment example */
+
+/* This is a /* nested comment */ .... */
+
+/* 
+ * This is a comment
+ * on several awesome lines yeah!
+ */
+
+ /*
+  * This is a 
+  * /* Nested comment
+  * on several lines (It's ugly right?)
+  */
+
+ /* And this is the end! Go grab your beer! */

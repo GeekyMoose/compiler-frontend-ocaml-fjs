@@ -18,16 +18,15 @@
 /* ---------------------------------------------------------------------------*/
 %token <int> INT_VALUE
 %token <string> STR_VALUE
-%token <string> VAR_NAME
-%token PLUS MINUS MULTIPLY DIVIDE LT LEQ EQ
+%token <string> IDENTIFIER
+%token PLUS MINUS STAR SLASH LT LEQ EQ
 %token LPAREN RPAREN LBRACET RBRACET
-%token PERIOD COMMA SEMICOLON HYPHEN UNDERSCORE
+%token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELIF ELSE VAR FUNCTION
 %token NEWLINE EOF
 
-%left ADD SUB
-%left MUL DIV
-%left NEG
+%left PLUS MINUS
+%left STAR SLAH
 
 %start body
 %type <unit> body
@@ -50,8 +49,8 @@ line:   NEWLINE {}
 exp:    INT_VALUE {$1}
         | exp PLUS exp {$1 + $3}
         | exp MINUS exp {$1 - $3}
-        | exp MULTIPLY exp {$1 * $3}
-        | exp DIVIDE exp {
+        | exp STAR exp {$1 * $3}
+        | exp SLASH exp {
             if $3 <> 0 then $1 / $3
             else (
                 let pos_start = Parsing.rhs_start_pos 3 in
@@ -71,7 +70,7 @@ exp:    INT_VALUE {$1}
         */
 ;
 
-var:    VAR VAR_NAME SEMICOLON {
+var:    VAR IDENTIFIER SEMICOLON {
             let loc = ("FILE-DEBUG", 1, 1) in
             let id = (loc, $2) in
             E.Var id
