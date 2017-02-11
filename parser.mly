@@ -4,6 +4,7 @@
 %{
     open Printf
     open Lexing
+    module E = Exp
 
     (* Called by the parser function on error *)
     let parse_error s = 
@@ -17,10 +18,12 @@
 /* ---------------------------------------------------------------------------*/
 %token <int> INT_VALUE
 %token <string> STR_VALUE
+%token <string> VAR_NAME
 %token PLUS MINUS MULTIPLY DIVIDE LT LEQ EQ
 %token LPAREN RPAREN LBRACET RBRACET
-%token NEWLINE PERIOD
+%token PERIOD COMMA SEMICOLON HYPHEN UNDERSCORE
 %token IF ELIF ELSE VAR FUNCTION
+%token NEWLINE EOF
 
 %left ADD SUB
 %left MUL DIV
@@ -36,6 +39,7 @@
 %%
 body:  /* empty */ {}
         | body line {}
+        | EOF {}
 ;
 
 line:   NEWLINE {}
@@ -65,6 +69,13 @@ exp:    INT_VALUE {$1}
         | exp LT exp {$1 < $3}
         | exp EQ exp {$1 = $3}
         */
+;
+
+var:    VAR VAR_NAME SEMICOLON {
+            let loc = ("FILE-DEBUG", 1, 1) in
+            let id = (loc, $2) in
+            E.Var id
+        }
 ;
 
 
