@@ -3,7 +3,7 @@ OCAMLC = ocamlc
 OCAMLY = ocamlyacc
 OCAMLL = ocamllex
 RM = rm
-TARGET = program-launcher
+TARGET = fjs-parser
 OBJS = exp.cmo parser.cmo lexer.cmo main.cmo
 
 FLAGS_YACC=-v

@@ -2,6 +2,10 @@
 /* NOT VALID NESTED: This is a /* nested comment .... */
 
 
+// Simple comment with invalid multi-lines comment started: /* haha
+*/
+
+
  Not valid start *****/
 
  /* Valid comment */

@@ -9,5 +9,6 @@ let input_file =
 let main() = 
     let lexbuf = Lexing.from_channel input_file in
     (*Lexer.debug_iter_tokens lexbuf*)
-    Parser.body Lexer.token lexbuf
+    Parser.program Lexer.token lexbuf
+
 let _ = Printexc.print main()

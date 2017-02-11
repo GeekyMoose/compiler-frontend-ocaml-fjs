@@ -1,5 +1,10 @@
-/* After parsing, this file should return anything (Just newlines) */
+//After parsing, this file should return anything (Just newlines)
+
+
 /* This is a simple comment example */
+// This is also a comment
+// This also is also a comment with useless /* /* /* inside */
+// This is a // comment of // useless comment
 
 /* This is a /* nested comment */ .... */
 
@@ -7,6 +12,8 @@
  * This is a comment
  * on several awesome lines yeah!
  */
+
+ // Simple valid comment
 
  /*
   * This is a 

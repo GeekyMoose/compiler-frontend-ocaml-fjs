@@ -43,7 +43,7 @@ let alpha_lower = ['a'-'z']
 let alpha       = alpha_upper | alpha_lower
 let alphanum    = digit | alpha
 
-let identifier  = alpha (alphanum | '-' | '_')*
+let identifier  = (alpha | '_') (alphanum | '_')*
 let str         = "\"[^\"]*\""
 
 let newline     = "\r\n" | "\n\r" | '\n' | '\r'
@@ -88,7 +88,8 @@ rule token = parse
     | "var"         {VAR}
 
     (* special keywords *)
-    | "/*"          {comments 0 lexbuf}
+    | "/*"          {multilines_comments 0 lexbuf}
+    | "//"          {inline_comments lexbuf}
 
     (* values *)
     | identifier as value   {IDENTIFIER (value)}
@@ -100,15 +101,22 @@ rule token = parse
     | _             {error lexbuf "Unknown character."}
 
 
-    (* comments section. Allow nested comments (No line restriction) *)
-    and comments level = parse
+    (* multi-lines comments. Allow nested comments (No line restriction) *)
+    and multilines_comments level = parse
     | "*/"          {if level = 0
                         then token lexbuf
-                        else comments (level-1) lexbuf
+                        else multilines_comments (level-1) lexbuf
                     }
-    | "/*"          {comments (level+1) lexbuf}
-    | _             {comments level lexbuf}
+    | "/*"          {multilines_comments (level+1) lexbuf}
+    | _             {multilines_comments level lexbuf}
     | eof           {error lexbuf "Comment started but no */ find."}
+
+
+    (* inline comments. Finish as soon as new line *)
+    and inline_comments = parse
+    | newline       {token lexbuf}
+    | _             {inline_comments lexbuf}
+
 
 
 

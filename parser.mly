@@ -28,22 +28,30 @@
 %left PLUS MINUS
 %left STAR SLAH
 
-%start body
-%type <unit> body
+%start program
+%type <unit> program
 
 
 /* ---------------------------------------------------------------------------*/
 /* GRAMMAR RULES (Rules and actions) */
 /* ---------------------------------------------------------------------------*/
 %%
-body:  /* empty */ {}
-        | body line {}
+program:  /* empty */ {}
+        | program line {}
         | EOF {}
 ;
+
 
 line:   NEWLINE {}
         | exp NEWLINE { printf "%d\n" $1; flush stdout}
         | error NEWLINE {}
+;
+
+var:    VAR IDENTIFIER SEMICOLON {
+            let loc = ("FILE-DEBUG", 1, 1) in
+            let id = (loc, $2) in
+            E.Var id
+        }
 ;
 
 exp:    INT_VALUE {$1}
@@ -68,13 +76,6 @@ exp:    INT_VALUE {$1}
         | exp LT exp {$1 < $3}
         | exp EQ exp {$1 = $3}
         */
-;
-
-var:    VAR IDENTIFIER SEMICOLON {
-            let loc = ("FILE-DEBUG", 1, 1) in
-            let id = (loc, $2) in
-            E.Var id
-        }
 ;
 
 
