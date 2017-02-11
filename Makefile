@@ -4,7 +4,10 @@ OCAMLY = ocamlyacc
 OCAMLL = ocamllex
 RM = rm
 TARGET = program-launcher
-OBJS = exp.cmo parser.cmo lexer.cmo main.cmo 
+OBJS = exp.cmo parser.cmo lexer.cmo main.cmo
+
+FLAGS_YACC=-v
+FLAGS_OC=
 
 
 # ------------------------------------------------------------------------------
@@ -12,22 +15,24 @@ $(TARGET) : $(OBJS)
 	$(OCAMLC) -o $(TARGET) $^
 
 %.mli: %.mly
-	$(OCAMLY) $<
+	$(OCAMLY) $(FLAGS_YACC) $^
 %.ml: %.mli
-	$(OCAMLC) -c $<
+	$(OCAMLC) -c $^
 
 %.ml: %.mll
-	$(OCAMLL) $<
+	$(OCAMLL) $^
 %.cmo: %.ml
-	$(OCAMLC) -c $<
+	$(OCAMLC) $(FLAGS_OC) -c $^
 
 
 # ------------------------------------------------------------------------------
 .PHONY: clean
 clean:
 	$(RM) -f *.cmo *.cmi *.mli
-	$(RM) -f *.out
+	$(RM) -f *.out *.output
 	$(RM) -f lexer.ml
 	$(RM) -f parser.ml
 	$(RM) -f $(OBJS)
 	$(RM) -f $(TARGET)
+	$(RM) -rf _build
+

@@ -20,12 +20,6 @@
             pos_lnum = pos.pos_lnum + 1;
             pos_bol = pos.pos_cnum;
         }
-    let current_filename lexbuf =
-        lexbuf.lex_curr_p.pos_fname
-    let current_lnum lexbuf = 
-        lexbuf.lex_curr_p.pos_lnum
-    let current_bol lexbuf =
-        lexbuf.lex_curr_p.pos_bol
 }
 
 
@@ -85,7 +79,7 @@ rule token = parse
     | newline {incr_lineno lexbuf; NEWLINE}
     | blank {token lexbuf}
     | _ {token lexbuf}
-    | eof {EOF}
+    | eof {raise End_of_file}
 
 
 
@@ -137,7 +131,7 @@ rule token = parse
 
         | NEWLINE -> print_endline "NEWLINE"; debug_iter_tokens lexbuf
         | EOF -> print_endline "EOF"
-        | _ -> print_token "UNKNOWN"; debug_iter_tokens lexbuf
+        | _ -> print_token "UNKNOWN"; debug_iter_tokens lexbuf (* TODO: ToDel *)
     ;;
 }
 
