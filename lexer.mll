@@ -21,6 +21,16 @@
             pos_lnum = pos.pos_lnum + 1;
             pos_bol = pos.pos_cnum;
         }
+
+
+    (* Error exception *)
+    exception Error of string
+
+    (* Error print function *)
+    let parse_error s = print_endline s
+
+    let error lexbuf msg = 
+        raise (Error msg)
 }
 
 
@@ -87,7 +97,7 @@ rule token = parse
 
     (* Special elements / Unrecognized elements*)
     | eof           {EOF}
-    | _             {token lexbuf}
+    | _             {error lexbuf "Unknown character."}
 
 
     (* comments section. Allow nested comments (No line restriction) *)
@@ -98,7 +108,7 @@ rule token = parse
                     }
     | "/*"          {comments (level+1) lexbuf}
     | _             {comments level lexbuf}
-    | eof           {EOF}
+    | eof           {error lexbuf "Comment started but no */ find."}
 
 
 

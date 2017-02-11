@@ -7,6 +7,7 @@ let input_file =
         -> print_string "No file name given!\n"; exit 1
 
 let main() = 
-        let lexbuf = Lexing.from_channel input_file in
-        Lexer.debug_iter_tokens lexbuf
+    let lexbuf = Lexing.from_channel input_file in
+    (*Lexer.debug_iter_tokens lexbuf*)
+    Parser.body Lexer.token lexbuf
 let _ = Printexc.print main()
