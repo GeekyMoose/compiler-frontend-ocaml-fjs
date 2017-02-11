@@ -8,7 +8,8 @@
 
  Not valid start *****/
 
- /* Valid comment */
+
+ /* Valid comment */ Outside comment (But Same line)
 
  /* 
   * Invalid 

@@ -25,10 +25,6 @@
 
     (* Error exception *)
     exception Error of string
-
-    (* Error print function *)
-    let parse_error s = print_endline s
-
     let error lexbuf msg = 
         raise (Error msg)
 }
@@ -58,7 +54,7 @@ let blank       = tabulation | whitespace
 (* ---------------------------------------------------------------------------*)
 rule token = parse
     (* layout *)
-    | newline       {incr_lineno lexbuf; NEWLINE}
+    | newline       {incr_lineno lexbuf; token lexbuf}
     | blank+        {token lexbuf}
 
     (* operators *)
@@ -152,7 +148,7 @@ rule token = parse
         | FUNCTION      -> print_token "FUNCTION"; debug_iter_tokens lexbuf
         | VAR           -> print_token "VAR"; debug_iter_tokens lexbuf
 
-        | IDENTIFIER x  ->  print_string "VAR_NAME(";
+        | IDENTIFIER x  ->  print_string "IDENTIFIER(";
                             print_string x;
                             print_token ")";
                             debug_iter_tokens lexbuf
@@ -165,7 +161,6 @@ rule token = parse
                             print_token ")";
                             debug_iter_tokens lexbuf
 
-        | NEWLINE       -> print_endline "NEWLINE"; debug_iter_tokens lexbuf
         | EOF           -> print_endline "EOF"
     ;;
 }

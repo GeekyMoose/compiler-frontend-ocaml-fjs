@@ -4,7 +4,6 @@
 %{
     open Printf
     open Lexing
-    module E = Exp
 
     (* Called by the parser function on error *)
     let parse_error s = 
@@ -23,36 +22,83 @@
 %token LPAREN RPAREN LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELIF ELSE VAR FUNCTION
-%token NEWLINE EOF
+%token EOF
 
 %left PLUS MINUS
 %left STAR SLAH
 
 %start program
-%type <unit> program
+%type <Exp.exp list> program
 
 
 /* ---------------------------------------------------------------------------*/
 /* GRAMMAR RULES (Rules and actions) */
 /* ---------------------------------------------------------------------------*/
 %%
-program:  /* empty */ {}
-        | program line {}
-        | EOF {}
+program:
+    EOF {[]}
+    | body EOF{$1}
+    | error EOF {print_endline "Error in program"; []}
 ;
 
-
-line:   NEWLINE {}
-        | exp NEWLINE { printf "%d\n" $1; flush stdout}
-        | error NEWLINE {}
+body:
+    block{$1}
+    | variable {[$1]}
+    | error {print_endline "Error in body";[]}
 ;
 
-var:    VAR IDENTIFIER SEMICOLON {
-            let loc = ("FILE-DEBUG", 1, 1) in
+block:
+    LBRACET RBRACET {[]}
+    | LBRACET body RBRACET {$2}
+;
+
+variable:
+    VAR IDENTIFIER SEMICOLON {
+            let loc = ("todo-filename", 1, 1) in
             let id = (loc, $2) in
-            E.Var id
+            Exp.Var id
         }
 ;
+
+
+
+
+
+
+/*
+TODO
+
+
+
+body_list:
+    body {[$1]}
+    | body_list body {$1 @ [$2]}
+;
+
+
+declaration:
+    FUNCTION IDENTIFIER LPAREN list_args RPAREN {}
+    | VAR IDENTIFIER EQ expression {}
+;
+
+expression:
+    FUNCTION LPAREN list_args RPAREN expression {}
+    | expression LPAREN list_expressions RPAREN {}
+;
+
+list_args:
+    INT_VALUE COMMA {}
+;
+
+list_expressions:
+    expression COMMA {}
+;
+
+number:
+    INT_VALUE {Exp.Num $1}
+;
+
+
 
 exp:    INT_VALUE {$1}
         | exp PLUS exp {$1 + $3}
@@ -70,17 +116,21 @@ exp:    INT_VALUE {$1}
          }
         | MINUS exp {-$2}
         | LPAREN exp RPAREN {$2}
+;
+*/
         /*
         TODO
         | exp LEQ exp {$1 <= $3}
         | exp LT exp {$1 < $3}
         | exp EQ exp {$1 = $3}
         */
-;
 
 
 /* ---------------------------------------------------------------------------*/
 /* TRAILER */
 /* ---------------------------------------------------------------------------*/
 %%
+
+
+
 
