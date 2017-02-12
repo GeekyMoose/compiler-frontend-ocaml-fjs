@@ -7,6 +7,29 @@ let input_file =
     with Invalid_argument a
         -> print_string "No file name given!\n"; exit 1
 
+let eval_exp expression =
+    try
+        let value = E.eval E.env_init expression in
+        print_string ("Result = " ^ (E.vprint value) ^ "\n")
+    with E.Error ((file, line, col), name)
+        -> print_string (file
+                        ^":"^string_of_int line
+                        ^":"^string_of_int col
+                        ^":Error: "^name ^"\n")
+    ;;
+
+let rec eval_all_exp = function
+    | [] -> ()
+    | h::t -> eval_exp h; eval_all_exp t;
+    ;;
+
+let debug_mode() =
+    print_endline "\n----- DEBUG PARSE -----";
+    let lexbuf = Lexing.from_channel input_file in
+    Lexer.debug_iter_tokens lexbuf;
+    print_endline "----- ----- -----";
+    ;;
+
 let parser_mode() =
     print_endline "\n----- PARSER -----";
     print_endline " - Start parsing...";
@@ -17,15 +40,8 @@ let parser_mode() =
     print_int size;
     print_endline ")";
     print_endline "----- ----- -----";
-    ;;
-
-
-
-let debug_mode() =
-    print_endline "\n----- DEBUG PARSE -----";
-    let lexbuf = Lexing.from_channel input_file in
-    Lexer.debug_iter_tokens lexbuf;
-    print_endline "----- ----- -----";
+    print_endline "\n----- EVAL -----";
+    eval_all_exp ast
     ;;
 
 let main() = 

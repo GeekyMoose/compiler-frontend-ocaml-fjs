@@ -35,6 +35,10 @@
 /* GRAMMAR RULES (Rules and actions) */
 /* ---------------------------------------------------------------------------*/
 %%
+
+
+/* -------------------------------------------------------------------------- */
+
 program:
     EOF {[]}
     | body EOF{$1}
@@ -42,9 +46,9 @@ program:
 ;
 
 body:
-    block{$1}
-    | variable {[$1]}
-    | error {print_endline "Error in body";[]}
+    block {$1}
+    | function_declaration function_call{[$1]@[$2]}
+    | error {print_endline "Error in body"; []}
 ;
 
 block:
@@ -52,46 +56,63 @@ block:
     | LBRACET body RBRACET {$2}
 ;
 
-variable:
-    VAR IDENTIFIER SEMICOLON {
-            let loc = ("todo-filename", 1, 1) in
-            let id = (loc, $2) in
-            Exp.Var id
+
+/* -------------------------------------------------------------------------- */
+expression:
+    number {$1}
+;
+
+
+/* -------------------------------------------------------------------------- */
+function_declaration:
+    FUNCTION identifier LPAREN list_args_option RPAREN expression {
+            let ids = [$2]@$4 in
+            Exp.Function (ids, $6)
         }
 ;
 
-
-
-
-
-
-/*
-TODO
-
-
-
-body_list:
-    body {[$1]}
-    | body_list body {$1 @ [$2]}
-;
-
-
-declaration:
-    FUNCTION IDENTIFIER LPAREN list_args RPAREN {}
-    | VAR IDENTIFIER EQ expression {}
-;
-
-expression:
-    FUNCTION LPAREN list_args RPAREN expression {}
-    | expression LPAREN list_expressions RPAREN {}
+list_args_option:
+    /* No args */ {[]}
+    | list_args {$1}
 ;
 
 list_args:
-    INT_VALUE COMMA {}
+    identifier {[$1]}
+    | list_args COMMA identifier {$1@[$3]}
 ;
 
-list_expressions:
-    expression COMMA {}
+/* -------------------------------------------------------------------------- */
+function_call:
+    identifier LPAREN list_parameters_option RPAREN {
+        let loc = ("todo-filename", 1, 1) in
+        let f = Exp.Var $1 in
+        Exp.Call (loc, f, $3)
+    }
+;
+
+list_parameters_option:
+    /* No params */ {[]}
+    | list_parameters {$1}
+;
+
+list_parameters:
+    expression {[$1]}
+    | list_parameters COMMA expression {$1@[$3]}
+;
+
+
+/* -------------------------------------------------------------------------- */
+
+identifier:
+    IDENTIFIER {
+        let loc = ("todo-filename", 1, 1) in
+        let id = (loc, $1) in
+        id
+    }
+;
+
+variable:
+    VAR identifier {Exp.Var $2}
 ;
 
 number:
@@ -100,6 +121,26 @@ number:
 
 
 
+
+
+/*
+TODO
+
+body_list:
+    body {[$1]}
+    | body_list body {$1 @ [$2]}
+;
+declaration:
+    FUNCTION IDENTIFIER LPAREN list_args RPAREN {}
+    | VAR IDENTIFIER EQ expression {}
+;
+expression:
+    FUNCTION LPAREN list_args RPAREN expression {}
+    | expression LPAREN list_expressions RPAREN {}
+;
+list_expressions:
+    expression COMMA {}
+;
 exp:    INT_VALUE {$1}
         | exp PLUS exp {$1 + $3}
         | exp MINUS exp {$1 - $3}
@@ -118,19 +159,17 @@ exp:    INT_VALUE {$1}
         | LPAREN exp RPAREN {$2}
 ;
 */
-        /*
-        TODO
-        | exp LEQ exp {$1 <= $3}
-        | exp LT exp {$1 < $3}
-        | exp EQ exp {$1 = $3}
-        */
+/*
+TODO
+| exp LEQ exp {$1 <= $3}
+| exp LT exp {$1 < $3}
+| exp EQ exp {$1 = $3}
+*/
 
 
 /* ---------------------------------------------------------------------------*/
 /* TRAILER */
 /* ---------------------------------------------------------------------------*/
 %%
-
-
 
 
