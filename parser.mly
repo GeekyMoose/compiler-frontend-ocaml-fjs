@@ -18,7 +18,7 @@
 %token <int> INT_VALUE
 %token <string> STR_VALUE
 %token <string> IDENTIFIER
-%token PLUS MINUS STAR SLASH LT LEQ EQ
+%token PLUS MINUS STAR SLASH LT LEQ EQ2 EQ
 %token LPAREN RPAREN LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELIF ELSE VAR FUNCTION
@@ -47,7 +47,6 @@ program:
 body:
     | /* Empty body */ {[]}
     | statement_list {$1}
-    | error {print_endline "Error in body"; []}
 ;
 
 block:
@@ -70,7 +69,8 @@ statement:
 
 declaration:
     | function_declaration {$1}
-    | variable{$1}
+    | variable {$1}
+    | string {$1}
 ;
 
 expression:
@@ -93,6 +93,10 @@ variable:
 
 number:
     INT_VALUE {Exp.Num $1}
+;
+
+string:
+    STR_VALUE{Exp.Str $1}
 ;
 
 /* -------------------------------------------------------------------------- */
@@ -130,51 +134,6 @@ list_parameters:
     expression {[$1]}
     | list_parameters COMMA expression {$1@[$3]}
 ;
-
-
-
-/* -------------------------------------------------------------------------- */
-/* TEMPORARY - TODO - TOCLEAN
-
-body_list:
-    body {[$1]}
-    | body_list body {$1 @ [$2]}
-;
-declaration:
-    FUNCTION IDENTIFIER LPAREN list_args RPAREN {}
-    | VAR IDENTIFIER EQ expression {}
-;
-expression:
-    FUNCTION LPAREN list_args RPAREN expression {}
-    | expression LPAREN list_expressions RPAREN {}
-;
-list_expressions:
-    expression COMMA {}
-;
-exp:    INT_VALUE {$1}
-        | exp PLUS exp {$1 + $3}
-        | exp MINUS exp {$1 - $3}
-        | exp STAR exp {$1 * $3}
-        | exp SLASH exp {
-            if $3 <> 0 then $1 / $3
-            else (
-                let pos_start = Parsing.rhs_start_pos 3 in
-                printf "Division by zero: %d.%d : "
-                    pos_start.pos_lnum
-                    (pos_start.pos_cnum - pos_start.pos_bol);
-                1
-            )
-         }
-        | MINUS exp {-$2}
-        | LPAREN exp RPAREN {$2}
-;
-*/
-/*
-TODO
-| exp LEQ exp {$1 <= $3}
-| exp LT exp {$1 < $3}
-| exp EQ exp {$1 = $3}
-*/
 
 
 /* ---------------------------------------------------------------------------*/

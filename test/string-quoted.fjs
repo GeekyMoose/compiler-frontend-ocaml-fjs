@@ -1,0 +1,9 @@
+"Simple string";
+"Backslash \\\\: \\";
+"BEL \\a: \a";
+"BS \\b: \b";
+"FF \\f: \f";
+"LF \\n: \n";
+"TAB \\t: \t";
+"VT \\v: \v";
+"CR \\r: \r";

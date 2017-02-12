@@ -40,7 +40,6 @@ let alpha       = alpha_upper | alpha_lower
 let alphanum    = digit | alpha
 
 let identifier  = (alpha | '_') (alphanum | '_')*
-let str         = "\"[^\"]*\""
 
 let newline     = "\r\n" | "\n\r" | '\n' | '\r'
 let whitespace  = ' '
@@ -63,8 +62,9 @@ rule token = parse
     | '*'           {STAR}
     | '/'           {SLASH}
     | '<'           {LT}
+    | '='           {EQ}
     | "<="          {LEQ}
-    | "=="          {EQ}
+    | "=="          {EQ2}
 
     (* elements / punctuation *)
     | '('           {LPAREN}
@@ -83,6 +83,9 @@ rule token = parse
     | "function"    {FUNCTION}
     | "var"         {VAR}
 
+    (* strings *)
+    | '"'           {STR_VALUE (double_quoted_string (Buffer.create 16) lexbuf)}
+
     (* special keywords *)
     | "/*"          {multilines_comments 0 lexbuf}
     | "//"          {inline_comments lexbuf}
@@ -90,7 +93,6 @@ rule token = parse
     (* values *)
     | identifier as value   {IDENTIFIER (value)}
     | digit+ as value       {INT_VALUE (int_of_string value)}
-    | str as value          {STR_VALUE (value)}
 
     (* Special elements / Unrecognized elements*)
     | eof           {EOF}
@@ -114,6 +116,33 @@ rule token = parse
     | _             {inline_comments lexbuf}
 
 
+    (* double_quoted_string *)
+    and double_quoted_string buff = parse
+    | '"'           {Buffer.contents buff;}
+    | '\\'          {escape_string_elt buff double_quoted_string lexbuf}
+    | _ as c        {Buffer.add_char buff c; double_quoted_string buff lexbuf}
+
+    and escape_string_elt buff return_fct = parse
+    | '"'
+    | '\''
+    | '\\' as c     {Buffer.add_char buff c; return_fct buff lexbuf}
+    | 'a'           {Buffer.add_char buff (char_of_int 7);
+                        return_fct buff lexbuf}
+    | 'b'           {Buffer.add_char buff (char_of_int 8);
+                        return_fct buff lexbuf}
+    | 'f'           {Buffer.add_char buff (char_of_int 12);
+                        return_fct buff lexbuf}
+    | 'n'           {Buffer.add_char buff (char_of_int 10);
+                        return_fct buff lexbuf}
+    | 'r'           {Buffer.add_char buff (char_of_int 13);
+                        return_fct buff lexbuf}
+    | 't'           {Buffer.add_char buff (char_of_int 9);
+                        return_fct buff lexbuf}
+    | 'v'           {Buffer.add_char buff (char_of_int 11);
+                        return_fct buff lexbuf}
+
+
+
 
 
 (* ---------------------------------------------------------------------------*)
@@ -132,6 +161,7 @@ rule token = parse
         | LT            -> print_token "LT"; debug_iter_tokens lexbuf
         | LEQ           -> print_token "LEQ"; debug_iter_tokens lexbuf
         | EQ            -> print_token "EQ"; debug_iter_tokens lexbuf
+        | EQ2           -> print_token "EQ2"; debug_iter_tokens lexbuf
 
         | LPAREN        -> print_token "LPAREN"; debug_iter_tokens lexbuf
         | RPAREN        -> print_token "RPAREN"; debug_iter_tokens lexbuf
@@ -139,7 +169,7 @@ rule token = parse
         | RBRACET       -> print_token "RBRACET"; debug_iter_tokens lexbuf
         | PERIOD        -> print_token "PERIOD"; debug_iter_tokens lexbuf
         | COMMA         -> print_token "COMMA"; debug_iter_tokens lexbuf
-        | SEMICOLON     -> print_token "SEMICOLON"; debug_iter_tokens lexbuf
+        | SEMICOLON     -> print_endline "SEMICOLON"; debug_iter_tokens lexbuf
         | UNDERSCORE    -> print_token "UNDERSCORE"; debug_iter_tokens lexbuf
 
         | IF            -> print_token "IF"; debug_iter_tokens lexbuf
