@@ -2,11 +2,21 @@ open Printf
 module P = Parser
 module E = Exp
 
+
+(* ---------------------------------------------------------------------------*)
 let input_file = 
     try open_in Sys.argv.(1)
     with Invalid_argument a
         -> print_string "No file name given!\n"; exit 1
 
+let debug_print_env_elt key value =
+    print_string key;;
+
+let debug_print_env_list env =
+    E.SMap.iter debug_print_env_elt env;;
+
+
+(* ---------------------------------------------------------------------------*)
 let eval_exp expression =
     try
         let value = E.eval E.env_init expression in
@@ -23,6 +33,8 @@ let rec eval_all_exp = function
     | h::t -> eval_exp h; eval_all_exp t;
     ;;
 
+
+(* ---------------------------------------------------------------------------*)
 let debug_mode() =
     print_endline "\n----- DEBUG PARSE -----";
     let lexbuf = Lexing.from_channel input_file in
@@ -41,7 +53,10 @@ let parser_mode() =
     print_endline ")";
     print_endline "----- ----- -----";
     print_endline "\n----- EVAL -----";
-    eval_all_exp ast
+    eval_all_exp ast;
+    print_endline "----- ----- -----";
+    print_endline "\n----- DEBUG Env list-----";
+    debug_print_env_list E.env_init
     ;;
 
 let main() = 

@@ -40,34 +40,65 @@
 /* -------------------------------------------------------------------------- */
 
 program:
-    EOF {[]}
-    | body EOF{$1}
+    | body EOF {$1}
     | error EOF {print_endline "Error in program"; []}
 ;
 
 body:
-    block {$1}
-    | function_declaration function_call{[$1]@[$2]}
+    | /* Empty body */ {[]}
+    | statement_list {$1}
     | error {print_endline "Error in body"; []}
 ;
 
 block:
-    LBRACET RBRACET {[]}
     | LBRACET body RBRACET {$2}
+    | LBRACET error RBRACET {print_endline "Error in block"; []}
 ;
 
 
 /* -------------------------------------------------------------------------- */
-expression:
-    number {$1}
+statement_list:
+    | block {$1}
+    | statement {[$1]}
+    | statement_list statement {$1@[$2]}
 ;
 
+statement:
+    | declaration SEMICOLON {$1}
+    | expression SEMICOLON {$1}
+;
+
+declaration:
+    | function_declaration {$1}
+    | variable{$1}
+;
+
+expression:
+    | number {$1}
+    | function_call {$1}
+;
+
+/* -------------------------------------------------------------------------- */
+identifier:
+    IDENTIFIER {
+        let loc = ("TODO-filename", 1, 1) in
+        let id = (loc, $1) in
+        id
+    }
+;
+
+variable:
+    VAR identifier {Exp.Var $2}
+;
+
+number:
+    INT_VALUE {Exp.Num $1}
+;
 
 /* -------------------------------------------------------------------------- */
 function_declaration:
     FUNCTION identifier LPAREN list_args_option RPAREN expression {
-            let ids = [$2]@$4 in
-            Exp.Function (ids, $6)
+            Exp.Function ($4, $6)
         }
 ;
 
@@ -83,9 +114,9 @@ list_args:
 
 /* -------------------------------------------------------------------------- */
 function_call:
-    identifier LPAREN list_parameters_option RPAREN {
-        let loc = ("todo-filename", 1, 1) in
-        let f = Exp.Var $1 in
+    expression LPAREN list_parameters_option RPAREN {
+        let loc = ("TODO-filename", 1, 1) in
+        let f = $1 in
         Exp.Call (loc, f, $3)
     }
 ;
@@ -101,30 +132,9 @@ list_parameters:
 ;
 
 
+
 /* -------------------------------------------------------------------------- */
-
-identifier:
-    IDENTIFIER {
-        let loc = ("todo-filename", 1, 1) in
-        let id = (loc, $1) in
-        id
-    }
-;
-
-variable:
-    VAR identifier {Exp.Var $2}
-;
-
-number:
-    INT_VALUE {Exp.Num $1}
-;
-
-
-
-
-
-/*
-TODO
+/* TEMPORARY - TODO - TOCLEAN
 
 body_list:
     body {[$1]}
