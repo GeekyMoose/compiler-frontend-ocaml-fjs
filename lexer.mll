@@ -2,7 +2,7 @@
  * Since:   Feb 9, 2017
  * Author:  Constantin
  *
- * Lexer for the grammar defined for Parser
+ * Lexer for the UdeM fjs language grammar (Functional language)
  *)
 
 
@@ -22,11 +22,14 @@
             pos_bol = pos.pos_cnum;
         }
 
-
-    (* Error exception *)
-    exception Error of string
-    let error lexbuf msg = 
-        raise (Error msg)
+    (* Throw an error *)
+    let tosserr lexbuf msg =
+        let errmsg  = "Lexer error: "^msg in
+        let fname   = lexbuf.lex_curr_p.pos_fname in
+        let lineno  = lexbuf.lex_curr_p.pos_lnum in
+        let charpos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
+        let loc     = (fname, lineno, charpos) in
+        raise (Exp.Error (loc, errmsg))
 }
 
 
@@ -96,7 +99,7 @@ rule token = parse
 
     (* Special elements / Unrecognized elements*)
     | eof           {EOF}
-    | _             {error lexbuf "Unknown character."}
+    | _             {tosserr lexbuf "Unknown character."}
 
 
     (* multi-lines comments. Allow nested comments (No line restriction) *)
@@ -107,7 +110,7 @@ rule token = parse
                     }
     | "/*"          {multilines_comments (level+1) lexbuf}
     | _             {multilines_comments level lexbuf}
-    | eof           {error lexbuf "Comment started but no */ find."}
+    | eof           {tosserr lexbuf "Comment started but not ended."}
 
 
     (* inline comments. Finish as soon as new line *)
@@ -120,6 +123,7 @@ rule token = parse
     and double_quoted_string buff = parse
     | '"'           {Buffer.contents buff;}
     | '\\'          {escape_string_elt buff double_quoted_string lexbuf}
+    | eof           {tosserr lexbuf "String started but not ended."}
     | _ as c        {Buffer.add_char buff c; double_quoted_string buff lexbuf}
 
     and escape_string_elt buff return_fct = parse

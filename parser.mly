@@ -1,3 +1,10 @@
+/*
+ * Since:   Feb 9, 2017
+ * Author:  Constantin
+ *
+ * Parser for the UdeM fjs language grammar (Functional language)
+ */
+
 /* ---------------------------------------------------------------------------*/
 /* HEADER SECTION */
 /* ---------------------------------------------------------------------------*/
@@ -70,11 +77,11 @@ statement:
 declaration:
     | function_declaration {$1}
     | variable {$1}
-    | string {$1}
 ;
 
 expression:
     | number {$1}
+    | string {$1}
     | function_call {$1}
 ;
 
@@ -107,12 +114,12 @@ function_declaration:
 ;
 
 list_args_option:
-    /* No args */ {[]}
+    | /* No args */ {[]}
     | list_args {$1}
 ;
 
 list_args:
-    identifier {[$1]}
+    | identifier {[$1]}
     | list_args COMMA identifier {$1@[$3]}
 ;
 
@@ -126,12 +133,12 @@ function_call:
 ;
 
 list_parameters_option:
-    /* No params */ {[]}
+    | /* No params */ {[]}
     | list_parameters {$1}
 ;
 
 list_parameters:
-    expression {[$1]}
+    | expression {[$1]}
     | list_parameters COMMA expression {$1@[$3]}
 ;
 
