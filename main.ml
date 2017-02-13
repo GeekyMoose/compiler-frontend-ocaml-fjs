@@ -35,6 +35,7 @@ let rec eval_all_exp = function
 
 
 (* ---------------------------------------------------------------------------*)
+(* Print a location *)
 let print_location (fname, lineno, charpos) = 
     print_string fname;
     print_string " / ";
@@ -42,6 +43,8 @@ let print_location (fname, lineno, charpos) =
     print_string " / ";
     print_string (string_of_int charpos);
     ;;
+
+(* Print expression error *)
 let print_exp_error loc msg = 
     print_string "[ERR] ";
     print_location loc;

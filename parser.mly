@@ -12,9 +12,32 @@
     open Printf
     open Lexing
 
+    let print_location (fname, lineno, charpos) = 
+        print_string fname;
+        print_string " / ";
+        print_string (string_of_int lineno);
+        print_string " / ";
+        print_string (string_of_int charpos);
+        ;;
+
+    (* Return the current location *)
+    let current_loc =
+        let pos     = Parsing.symbol_start_pos() in
+        let fname   = pos.pos_fname in
+        let lineno  = pos.pos_lnum in
+        let charpos = pos.pos_cnum - pos.pos_bol in
+        (fname, lineno, charpos);;
+
     (* Called by the parser function on error *)
-    let parse_error s = 
-        print_endline s;
+    let parse_error msg = 
+        flush stdout;;
+
+    (* Print error *)
+    let print_error loc msg = 
+        print_string "[ERR] ";
+        print_location loc;
+        print_string ": Parse error: ";
+        print_endline msg;;
         flush stdout;;
 %}
 
@@ -48,7 +71,7 @@
 
 program:
     | body EOF {$1}
-    | error EOF {print_endline "Error in program"; []}
+    | error EOF {print_error current_loc "Invalid program"; []}
 ;
 
 body:
@@ -58,7 +81,7 @@ body:
 
 block:
     | LBRACET body RBRACET {$2}
-    | LBRACET error RBRACET {print_endline "Error in block"; []}
+    | LBRACET error RBRACET {print_error current_loc "Invalid block"; []}
 ;
 
 
@@ -87,9 +110,8 @@ expression:
 
 /* -------------------------------------------------------------------------- */
 identifier:
-    IDENTIFIER {
-        let loc = ("TODO-filename", 1, 1) in
-        let id = (loc, $1) in
+    | IDENTIFIER {
+        let id = (current_loc, $1) in
         id
     }
 ;
@@ -108,7 +130,7 @@ string:
 
 /* -------------------------------------------------------------------------- */
 function_declaration:
-    FUNCTION identifier LPAREN list_args_option RPAREN expression {
+    | FUNCTION identifier LPAREN list_args_option RPAREN expression {
             Exp.Function ($4, $6)
         }
 ;
@@ -125,11 +147,9 @@ list_args:
 
 /* -------------------------------------------------------------------------- */
 function_call:
-    expression LPAREN list_parameters_option RPAREN {
-        let loc = ("TODO-filename", 1, 1) in
-        let f = $1 in
-        Exp.Call (loc, f, $3)
-    }
+    | expression LPAREN list_parameters_option RPAREN {
+            Exp.Call (current_loc, $1, $3)
+        }
 ;
 
 list_parameters_option:
