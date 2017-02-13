@@ -106,6 +106,34 @@ expression:
     | number {$1}
     | string {$1}
     | function_call {$1}
+    | if_statement {$1}
+;
+
+/* -------------------------------------------------------------------------- */
+if_statement:
+    | IF LPAREN unary_test RPAREN expression if_follow {
+            Exp.If (current_loc, $3, $5, $6)
+        }
+;
+
+if_follow:
+    | ELSE expression {$2}
+;
+
+/* -------------------------------------------------------------------------- */
+unary_test:
+    /* TODO: resolve conflicts + type */
+    | expression LEQ expression {Exp.PrimOp(current_loc, Exp.Leq, $1::$3::[])}
+    | expression LT expression {Exp.PrimOp(current_loc, Exp.Lt, $1::$3::[])}
+    | expression EQ expression {Exp.PrimOp(current_loc, Exp.Eq, $1::$3::[])}
+;
+
+binop:
+    /* TODO: resolve conflicts + type */
+    | expression PLUS expression {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
+    | expression MINUS expression {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
+    | expression STAR expression {Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
+    | expression SLASH expression {Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
 ;
 
 /* -------------------------------------------------------------------------- */

@@ -1,0 +1,4 @@
+{
+    function toto() 2;
+    function toto2() 2;
+}
