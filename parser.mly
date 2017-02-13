@@ -71,7 +71,7 @@
 
 program:
     | body EOF {$1}
-    | error EOF {print_error current_loc "Invalid program"; []}
+    /*| error EOF {print_error current_loc "Invalid program"; []}*/
 ;
 
 body:
@@ -81,7 +81,6 @@ body:
 
 block:
     | LBRACET body RBRACET {$2}
-    | LBRACET error RBRACET {print_error current_loc "Invalid block"; []}
 ;
 
 

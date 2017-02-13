@@ -51,6 +51,11 @@ let print_exp_error loc msg =
     print_string ": ";
     print_endline msg;;
 
+let print_parser_err lexbuf =
+    let loc     = Lexer.lexbuf_curr_loc lexbuf in
+    let c       = Char.escaped (Lexing.lexeme_char lexbuf 0) in
+    let errmsg  = "Parser error after token "^c in
+    print_exp_error loc errmsg;;
 
 
 (* ---------------------------------------------------------------------------*)
@@ -62,10 +67,10 @@ let debug_mode() =
     ;;
 
 let parser_mode() =
+    let lexbuf  = Lexing.from_channel input_file in
     try
         print_endline "\n----- PARSER -----";
         print_endline " - Start parsing...";
-        let lexbuf  = Lexing.from_channel input_file in
         let ast     = Parser.program Lexer.token lexbuf in
         let size    = List.length ast in
         print_string " + [SUCCESS] Parsing successfully done! (Number elt: ";
@@ -77,8 +82,11 @@ let parser_mode() =
         print_endline "----- ----- -----";
         print_endline "\n----- DEBUG Env list-----";
         debug_print_env_list E.env_init
-    with Exp.Error (loc,msg) ->
-        print_exp_error loc msg
+    with
+        | Parsing.Parse_error ->
+            print_parser_err lexbuf
+        | Exp.Error (loc,msg) ->
+            print_exp_error loc msg
     ;;
 
 let main() = 

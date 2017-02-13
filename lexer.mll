@@ -22,6 +22,12 @@
             pos_bol = pos.pos_cnum;
         }
 
+    let lexbuf_curr_loc lexbuf = 
+        let fname   = lexbuf.lex_curr_p.pos_fname in
+        let lineno  = lexbuf.lex_curr_p.pos_lnum in
+        let charpos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
+        (fname, lineno, charpos);;
+
     (* Throw an error *)
     let tosserr lexbuf msg =
         let errmsg  = "Lexer error: "^msg in
