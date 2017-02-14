@@ -1,4 +1,5 @@
-var toto;
-var toto2;
-var toto_3;
-var tata;
+var toto    = 2;
+var toto2   = 2;
+var toto_2  = 2;
+var toto_3  = if (1=2) 42 else 21;
+var toto_4  = -10-10*2017;

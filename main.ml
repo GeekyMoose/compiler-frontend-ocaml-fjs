@@ -53,8 +53,8 @@ let print_exp_error loc msg =
 
 let print_parser_err lexbuf =
     let loc     = Lexer.lexbuf_curr_loc lexbuf in
-    let c       = Char.escaped (Lexing.lexeme_char lexbuf 0) in
-    let errmsg  = "Parser error after token "^c in
+    let str     = Lexing.lexeme lexbuf in
+    let errmsg  = "Parser error around token "^str in
     print_exp_error loc errmsg;;
 
 

@@ -20,7 +20,7 @@
         print_string (string_of_int charpos);
         ;;
 
-    (* Return the current location *)
+    (* DEPRECATED - Return the current location *)
     let current_loc =
         let pos     = Parsing.symbol_start_pos() in
         let fname   = pos.pos_fname in
@@ -86,7 +86,7 @@ block:
 
 /* -------------------------------------------------------------------------- */
 statement_list:
-    | block {$1}
+    | block {$1} /* Must be moved. here error if 2 blocks */
     | statement {[$1]}
     | statement_list statement {$1@[$2]}
 ;
@@ -98,14 +98,20 @@ statement:
 
 declaration:
     | function_declaration {$1}
-    | variable {$1}
+    | variable_declaration {$1}
+    | string_value {$1} /* TODO: Debug. Should be moved */
 ;
 
 expression:
-    | number {$1}
-    | string {$1}
     | function_call {$1}
     | if_statement {$1}
+    | expression_number {$1}
+    | variable_get {$1}
+;
+
+expression_number:
+    | number {$1}
+    | binop {$1}
 ;
 
 /* -------------------------------------------------------------------------- */
@@ -128,11 +134,12 @@ unary_test:
 ;
 
 binop:
-    /* TODO: resolve conflicts + type */
+    /* TODO: resolve shitf/reduce conflicts + type */
     | expression PLUS expression {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
     | expression MINUS expression {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
     | expression STAR expression {Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
     | expression SLASH expression {Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
+    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2])}
 ;
 
 /* -------------------------------------------------------------------------- */
@@ -143,15 +150,20 @@ identifier:
     }
 ;
 
-variable:
-    VAR identifier {Exp.Var $2}
+variable_declaration:
+    /* TODO: Change Var by Let. Here just to compile but doesn't make sence*/
+    VAR identifier EQ expression {Exp.Var $2}
+;
+
+variable_get:
+    identifier {Exp.Var $1}
 ;
 
 number:
     INT_VALUE {Exp.Num $1}
 ;
 
-string:
+string_value:
     STR_VALUE{Exp.Str $1}
 ;
 
