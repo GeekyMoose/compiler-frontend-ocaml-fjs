@@ -1,5 +1,3 @@
-var toto    = 2;
-var toto2   = 2;
-var toto_2  = 2;
-var toto_3  = if (1=2) 42 else 21;
-var toto_4  = -10-10*2017;
+var a = 42;
+var b = 50;
+if (1=2) a else a+8;

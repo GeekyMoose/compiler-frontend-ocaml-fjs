@@ -3,6 +3,9 @@
  * Author:  Constantin
  *
  * Parser for the UdeM fjs language grammar (Functional language)
+ *
+ * Note:
+ * This file is under heavy work and has several tmp elt / todo
  */
 
 /* ---------------------------------------------------------------------------*/
@@ -68,7 +71,8 @@
 
 
 /* -------------------------------------------------------------------------- */
-
+/* Layers */
+/* -------------------------------------------------------------------------- */
 program:
     | body EOF {$1}
     /*| error EOF {print_error current_loc "Invalid program"; []}*/
@@ -85,6 +89,8 @@ block:
 
 
 /* -------------------------------------------------------------------------- */
+/* Statements / Expressions */
+/* -------------------------------------------------------------------------- */
 statement_list:
     | block {$1} /* Must be moved. here error if 2 blocks */
     | statement {[$1]}
@@ -99,7 +105,6 @@ statement:
 declaration:
     | function_declaration {$1}
     | variable_declaration {$1}
-    | string_value {$1} /* TODO: Debug. Should be moved */
 ;
 
 expression:
@@ -107,13 +112,17 @@ expression:
     | if_statement {$1}
     | expression_number {$1}
     | variable_get {$1}
+    | string_value {$1}
 ;
 
 expression_number:
-    | number {$1}
+    | number_value {$1}
     | binop {$1}
 ;
 
+
+/* -------------------------------------------------------------------------- */
+/* If-then-else */
 /* -------------------------------------------------------------------------- */
 if_statement:
     | IF LPAREN unary_test RPAREN expression if_follow {
@@ -125,6 +134,9 @@ if_follow:
     | ELSE expression {$2}
 ;
 
+
+/* -------------------------------------------------------------------------- */
+/* Numbers / String / Operators / IDs
 /* -------------------------------------------------------------------------- */
 unary_test:
     /* TODO: resolve conflicts + type */
@@ -142,31 +154,48 @@ binop:
     | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2])}
 ;
 
-/* -------------------------------------------------------------------------- */
-identifier:
-    | IDENTIFIER {
-        let id = (current_loc, $1) in
-        id
-    }
-;
-
-variable_declaration:
-    /* TODO: Change Var by Let. Here just to compile but doesn't make sence*/
-    VAR identifier EQ expression {Exp.Var $2}
-;
-
-variable_get:
-    identifier {Exp.Var $1}
-;
-
-number:
-    INT_VALUE {Exp.Num $1}
+number_value:
+    | INT_VALUE {Exp.Num $1}
 ;
 
 string_value:
-    STR_VALUE{Exp.Str $1}
+    | STR_VALUE{Exp.Str $1}
 ;
 
+identifier:
+    | IDENTIFIER {let id = (current_loc, $1) in id}
+;
+
+
+/* -------------------------------------------------------------------------- */
+/* Variables */
+/* -------------------------------------------------------------------------- */
+variable_declaration:
+    /* TODO: To clean */
+    | variable_declaration_element SEMICOLON expression {Exp.Let([$1],$3)}
+    | variable_declaration_element SEMICOLON declaration {Exp.Let([$1],$3)}
+    /*
+    | variable_declaration_list COMMA expression SEMICOLON {Exp.Let($1,$3)}
+    | variable_declaration_list {Exp.Let($1, Exp.Num 0)}
+    */
+;
+
+variable_declaration_list:
+    | variable_declaration_element {[$1]}
+    | variable_declaration_list SEMICOLON variable_declaration_element {$1@[$3]}
+;
+
+variable_declaration_element:
+    | VAR identifier EQ expression {($2,$4)}
+;
+
+variable_get:
+    | identifier {Exp.Var $1}
+;
+
+
+/* -------------------------------------------------------------------------- */
+/* Functions
 /* -------------------------------------------------------------------------- */
 function_declaration:
     | FUNCTION identifier LPAREN list_args_option RPAREN expression {
@@ -206,5 +235,3 @@ list_parameters:
 /* TRAILER */
 /* ---------------------------------------------------------------------------*/
 %%
-
-
