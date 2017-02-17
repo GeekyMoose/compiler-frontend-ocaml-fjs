@@ -51,6 +51,7 @@
 %token <int> INT_VALUE
 %token <string> STR_VALUE
 %token <string> IDENTIFIER
+%token <bool> BOOLEAN
 %token PLUS MINUS STAR SLASH LT LEQ EQ2 EQ
 %token LPAREN RPAREN LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
@@ -125,13 +126,19 @@ expression_number:
 /* If-then-else */
 /* -------------------------------------------------------------------------- */
 if_statement:
-    | IF LPAREN unary_test RPAREN expression if_follow {
-            Exp.If (current_loc, $3, $5, $6)
+    | IF LPAREN unary_test RPAREN expression{
+            Exp.If (current_loc, $3, $5, Exp.Num 0)
+        }
+    | IF LPAREN unary_test RPAREN if_follow ELSE expression {
+            Exp.If (current_loc, $3, $5, $7)
         }
 ;
 
 if_follow:
-    | ELSE expression {$2}
+    | IF LPAREN unary_test RPAREN if_follow ELSE if_follow {
+            Exp.If(current_loc, $3, $5, $7)
+        }
+    | LBRACET expression RBRACET {$2}
 ;
 
 
@@ -164,6 +171,10 @@ string_value:
 
 identifier:
     | IDENTIFIER {let id = (current_loc, $1) in id}
+;
+
+boolean:
+    | BOOLEAN {Exp.Boolean $1}
 ;
 
 

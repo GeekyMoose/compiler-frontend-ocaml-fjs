@@ -35,7 +35,7 @@
         let lineno  = lexbuf.lex_curr_p.pos_lnum in
         let charpos = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol in
         let loc     = (fname, lineno, charpos) in
-        raise (Exp.Error (loc, errmsg))
+        raise (Exp.Error(loc, errmsg))
 }
 
 
@@ -91,13 +91,15 @@ rule token = parse
     | "else if"     {ELIF}
     | "function"    {FUNCTION}
     | "var"         {VAR}
-
-    (* strings *)
-    | '"'           {STR_VALUE (double_quoted_string (Buffer.create 16) lexbuf)}
+    | "true"        {BOOLEAN(true)}
+    | "false"       {BOOLEAN(false)}
 
     (* special keywords *)
     | "/*"          {multilines_comments 0 lexbuf}
     | "//"          {inline_comments lexbuf}
+
+    (* strings *)
+    | '"'           {STR_VALUE (double_quoted_string (Buffer.create 16) lexbuf)}
 
     (* values *)
     | identifier as value   {IDENTIFIER (value)}
@@ -187,6 +189,11 @@ rule token = parse
         | ELIF          -> print_token "ELIF"; debug_iter_tokens lexbuf
         | FUNCTION      -> print_token "FUNCTION"; debug_iter_tokens lexbuf
         | VAR           -> print_token "VAR"; debug_iter_tokens lexbuf
+
+        | BOOLEAN x     ->  print_string "BOOL(";
+                            print_string (string_of_bool x);
+                            print_token ")"; 
+                            debug_iter_tokens lexbuf
 
         | IDENTIFIER x  ->  print_string "IDENTIFIER(";
                             print_string x;

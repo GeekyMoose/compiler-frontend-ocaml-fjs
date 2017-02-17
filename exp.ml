@@ -14,15 +14,16 @@ type oper = Add | Sub | Mul | Div | Neg | Leq | Lt | Eq
 
 (* Expressions du langage.  *)
 type exp =
-  | Var of id
-  | Num of int
-  | Str of string
-  | Function of id list * exp
-  | Call of location * exp * exp list
-  | Select of exp * id
-  | If of location * exp * exp * exp
-  | Let of (id * exp) list * exp
-  | PrimOp of location * oper * exp list
+    | Boolean of bool
+    | Var of id
+    | Num of int
+    | Str of string
+    | Function of id list * exp
+    | Call of location * exp * exp list
+    | Select of exp * id
+    | If of location * exp * exp * exp
+    | Let of (id * exp) list * exp
+    | PrimOp of location * oper * exp list
 
 (***************************************************************************)
 (****                   Interpréteur simpl(ist)e                        ****)
@@ -49,6 +50,7 @@ let rec env_extend l env xs vs =
   | _ -> raise (Error (l, "wrong number of arguments"))
 
 let rec eval (env : value ref SMap.t) (e : exp) : value = match e with
+  | Boolean value -> if value then Vbool true else Vbool false
   | Var ((_, x)) -> !(SMap.find x env)
   | Num n -> Vnum n
   | Str s -> Vstring s
