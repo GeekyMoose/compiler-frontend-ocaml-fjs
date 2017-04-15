@@ -1,0 +1,22 @@
+if (1=2) 
+    if (1=1) 1 else 2
+else 4;
+
+
+
+var a = 42;
+var b = 50;
+if (1=2) a else b+8;
+
+
+
+function toto () 666;
+function toto_2 () 667;
+
+
+var c = 20;
+function toto_3() 3;
+
+
+var d = toto();
+if (1=1) 1 else 2;

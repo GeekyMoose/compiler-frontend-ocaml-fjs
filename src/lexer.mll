@@ -88,7 +88,6 @@ rule token = parse
     (* keywords *)
     | "if"          {IF}
     | "else"        {ELSE}
-    | "else if"     {ELIF}
     | "function"    {FUNCTION}
     | "var"         {VAR}
     | "true"        {BOOLEAN(true)}
@@ -186,7 +185,6 @@ rule token = parse
 
         | IF            -> print_token "IF"; debug_iter_tokens lexbuf
         | ELSE          -> print_token "ELSE"; debug_iter_tokens lexbuf
-        | ELIF          -> print_token "ELIF"; debug_iter_tokens lexbuf
         | FUNCTION      -> print_token "FUNCTION"; debug_iter_tokens lexbuf
         | VAR           -> print_token "VAR"; debug_iter_tokens lexbuf
 
