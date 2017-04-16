@@ -15,7 +15,7 @@
     open Printf
     open Lexing
 
-    let print_location (fname, lineno, charpos) = 
+    let print_location (fname, lineno, charpos) =
         print_string fname;
         print_string " / ";
         print_string (string_of_int lineno);
@@ -36,12 +36,15 @@
         flush stdout;;
 
     (* Print error *)
-    let print_error loc msg = 
+    let print_error loc msg =
         print_string "[ERR] ";
         print_location loc;
         print_string ": Parse error: ";
         print_endline msg;;
         flush stdout;;
+
+    (* Identity function *)
+    let identity = fun x -> x;;
 %}
 
 
@@ -80,7 +83,7 @@ program:
 ;
 
 body:
-    | /* Empty body */ {[]}
+    | /*Empty body*/ {[]}
     | statement_list {$1}
 ;
 
@@ -90,7 +93,7 @@ block:
 
 
 /* -------------------------------------------------------------------------- */
-/* Statements / Expressions */
+/* Statements - Expressions */
 /* -------------------------------------------------------------------------- */
 statement_list:
     | block {$1} /* Must be moved. here error if 2 blocks */
@@ -111,13 +114,7 @@ declaration:
 expression:
     | function_call {$1}
     | if_statement {$1}
-    | expression_number {$1}
-    | variable_get {$1}
     | string_value {$1}
-;
-
-expression_number:
-    | number_value {$1}
     | binop {$1}
 ;
 
@@ -151,19 +148,21 @@ if_test:
 /* Binop operations
 /* -------------------------------------------------------------------------- */
 binop:
-    | binop PLUS binop_2 {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
-    | binop MINUS binop_2 {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
+    | binop PLUS binop_follow {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
+    | binop MINUS binop_follow {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
     | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, $2::[])}
-    | binop_2 {$1}
+    | binop_follow {$1}
 ;
 
-binop_2:
-    | binop_2 STAR binop_final{Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
-    | binop_2 SLASH binop_final{Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
+binop_follow:
+    | binop_follow STAR binop_final {Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
+    | binop_follow SLASH binop_final {Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
+    | binop_final {$1}
 ;
 
 binop_final:
-    | expression {$1}
+    | number_value {$1}
+    | variable_get {$1}
 ;
 
 
@@ -175,23 +174,21 @@ unary_test:
 ;
 
 unary_test_follow:
-    | LEQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, x::$2::[])}
-    | LT expression {fun x -> Exp.PrimOp(current_loc, Exp.Lt, x::$2::[])}
-    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, x::$2::[])}
+    | LEQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, [x;$2])}
+    | LT expression {fun x -> Exp.PrimOp(current_loc, Exp.Lt, [x;$2])}
+    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, [x;$2;])}
 ;
 
 
 /* -------------------------------------------------------------------------- */
-/* Numbers / String / Operators / IDs
+/* Final elements
 /* -------------------------------------------------------------------------- */
-
-
 number_value:
     | INT_VALUE {Exp.Num $1}
 ;
 
 string_value:
-    | STR_VALUE{Exp.Str $1}
+    | STR_VALUE {Exp.Str $1}
 ;
 
 identifier:
