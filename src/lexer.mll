@@ -76,8 +76,8 @@ rule token = parse
     | "=="          {EQ2}
 
     (* elements / punctuation *)
-    | '('           {LPAREN}
-    | ')'           {RPAREN}
+    | '('           {LPAR}
+    | ')'           {RPAR}
     | '{'           {LBRACET}
     | '}'           {RBRACET}
     | '.'           {PERIOD}
@@ -174,8 +174,8 @@ rule token = parse
         | EQ            -> print_token "EQ"; debug_iter_tokens lexbuf
         | EQ2           -> print_token "EQ2"; debug_iter_tokens lexbuf
 
-        | LPAREN        -> print_token "LPAREN"; debug_iter_tokens lexbuf
-        | RPAREN        -> print_token "RPAREN"; debug_iter_tokens lexbuf
+        | LPAR          -> print_token "LPAR"; debug_iter_tokens lexbuf
+        | RPAR          -> print_token "RPAR"; debug_iter_tokens lexbuf
         | LBRACET       -> print_token "LBRACET"; debug_iter_tokens lexbuf
         | RBRACET       -> print_token "RBRACET"; debug_iter_tokens lexbuf
         | PERIOD        -> print_token "PERIOD"; debug_iter_tokens lexbuf

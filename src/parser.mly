@@ -56,13 +56,15 @@
 %token <string> IDENTIFIER
 %token <bool> BOOLEAN
 %token PLUS MINUS STAR SLASH LT LEQ EQ2 EQ
-%token LPAREN RPAREN LBRACET RBRACET
+%token LPAR RPAR LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELSE VAR FUNCTION
 %token EOF
 
+/* See binop rules: this should work without %left
 %left PLUS MINUS
 %left STAR SLAH
+*/
 
 %start program
 %type <Exp.exp list> program
@@ -123,16 +125,16 @@ expression:
 /* If-then-else */
 /* -------------------------------------------------------------------------- */
 if_statement:
-    | IF LPAREN if_test RPAREN if_follow{
+    | IF LPAR if_test RPAR if_follow{
             Exp.If(current_loc, $3, $5, Exp.Num 0)
         }
-    | IF LPAREN if_test RPAREN if_follow ELSE if_follow {
+    | IF LPAR if_test RPAR if_follow ELSE if_follow {
             Exp.If(current_loc, $3, $5, $7)
         }
 ;
 
 if_follow:
-    | IF LPAREN if_test RPAREN if_follow ELSE if_follow {
+    | IF LPAR if_test RPAR if_follow ELSE if_follow {
             Exp.If(current_loc, $3, $5, $7)
         }
     | LBRACET expression RBRACET {$2}
@@ -148,21 +150,30 @@ if_test:
 /* Binop operations
 /* -------------------------------------------------------------------------- */
 binop:
-    | binop PLUS binop_follow {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
-    | binop MINUS binop_follow {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
-    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, $2::[])}
-    | binop_follow {$1}
+    | binop_factor binop_add {$2 $1}
 ;
 
-binop_follow:
-    | binop_follow STAR binop_final {Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
-    | binop_follow SLASH binop_final {Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
-    | binop_final {$1}
+binop_factor:
+    | binop_final binop_factor_follow {$2 $1}
+;
+
+binop_factor_follow:
+    | /*Empty*/ {fun x -> x}
+    | STAR binop_factor {fun x -> Exp.PrimOp(current_loc, Exp.Mul, [x;$2])}
+    | SLASH binop_factor {fun x -> Exp.PrimOp(current_loc, Exp.Div, [x;$2])}
+;
+
+binop_add:
+    | /*Empty*/ {fun x -> x}
+    | PLUS binop {fun x -> Exp.PrimOp(current_loc, Exp.Add, [x;$2])}
+    | MINUS binop {fun x -> Exp.PrimOp(current_loc, Exp.Sub, [x;$2])}
 ;
 
 binop_final:
     | number_value {$1}
     | variable_get {$1}
+    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2;])}
+    | LPAR binop RPAR {$2}
 ;
 
 
@@ -176,7 +187,7 @@ unary_test:
 unary_test_follow:
     | LEQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, [x;$2])}
     | LT expression {fun x -> Exp.PrimOp(current_loc, Exp.Lt, [x;$2])}
-    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, [x;$2;])}
+    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, [x;$2])}
 ;
 
 
@@ -231,7 +242,7 @@ variable_get:
 /* Functions
 /* -------------------------------------------------------------------------- */
 function_declaration:
-    | FUNCTION identifier LPAREN list_args_option RPAREN expression {
+    | FUNCTION identifier LPAR list_args_option RPAR expression {
             Exp.Function ($4, $6)
         }
 ;
@@ -248,7 +259,7 @@ list_args:
 
 /* -------------------------------------------------------------------------- */
 function_call:
-    | expression LPAREN list_parameters_option RPAREN {
+    | expression LPAR list_parameters_option RPAR {
             Exp.Call (current_loc, $1, $3)
         }
 ;
