@@ -16,6 +16,7 @@ stringvar;
 1;
 1+10*5-1*2+1;
 1+1+10*5+1-10-10*2+1;
+10*(1-1); //For () use
 
 var a = 5;
 var b = 10;
@@ -38,15 +39,15 @@ else 0;
 var v1 = 1;
 if(v1<0) 2;
 
-function toto() 42;
-//toto();
-//var vftoto = toto();
 
-//function toto_2 () 667;
+// -----------------------------------------------------------------------------
+// Functions
+// -----------------------------------------------------------------------------
+function add(a,b,c) a+b+c;
+
+function max(a,b)
+    if(b<a) a
+    else b;
+//max(1,2);
 
 
-//var c = 20;
-//function toto_3() 3;
-
-
-//var d = toto();
