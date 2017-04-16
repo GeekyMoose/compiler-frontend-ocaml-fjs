@@ -15,6 +15,16 @@
 
 
 
+# Compile and run project
+```
+cd src
+make
+fjs-parser x
+```
+> x is a jfs file to parse
+
+
+
 # FJS language
 > Functional language inspired from JavaScript language.<br/>
 > Introduced by University of Montreal for the Compiler course
@@ -44,15 +54,6 @@
 - body is a sequence of declarations and expressions separated by a semi-colon
 - Can have comments (One lines / multi-lines)
 - String with "..." (And common escape char with \\)
-
-
-
-# Compile and run project
-```
-make
-fjs-parser x
-```
-> x should be a file (Examples in `test/` folder)
 
 
 

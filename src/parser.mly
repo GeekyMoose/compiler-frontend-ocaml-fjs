@@ -55,13 +55,13 @@
 %token <string> STR_VALUE
 %token <string> IDENTIFIER
 %token <bool> BOOLEAN
-%token PLUS MINUS STAR SLASH LT LEQ EQ2 EQ
+%token PLUS MINUS STAR SLASH LT LEQ EQ
 %token LPAR RPAR LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELSE VAR FUNCTION
 %token EOF
 
-/* See binop rules: this should work without %left
+/* See binop rules: %left is not required anymore
 %left PLUS MINUS
 %left STAR SLAH
 */
@@ -172,8 +172,8 @@ binop_add:
 binop_final:
     | number_value {$1}
     | variable_get {$1}
-    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2;])}
     | LPAR binop RPAR {$2}
+    /*| MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2;])}*/
 ;
 
 

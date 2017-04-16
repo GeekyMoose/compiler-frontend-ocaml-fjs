@@ -73,7 +73,6 @@ rule token = parse
     | '<'           {LT}
     | '='           {EQ}
     | "<="          {LEQ}
-    | "=="          {EQ2}
 
     (* elements / punctuation *)
     | '('           {LPAR}
@@ -172,7 +171,6 @@ rule token = parse
         | LT            -> print_token "LT"; debug_iter_tokens lexbuf
         | LEQ           -> print_token "LEQ"; debug_iter_tokens lexbuf
         | EQ            -> print_token "EQ"; debug_iter_tokens lexbuf
-        | EQ2           -> print_token "EQ2"; debug_iter_tokens lexbuf
 
         | LPAR          -> print_token "LPAR"; debug_iter_tokens lexbuf
         | RPAR          -> print_token "RPAR"; debug_iter_tokens lexbuf
