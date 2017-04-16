@@ -1,17 +1,13 @@
-// Simple test file
+// Simple test file for FJS language
+
 
 // -----------------------------------------------------------------------------
-// IF STATEMENTS
+// Variables test
 // -----------------------------------------------------------------------------
-if(1=2)
-    if (1=1) 1
-    else 2
-else 4;
-
-if(42=41) 41
-else if(32=43) 32
-else if(42=42) 42
-else 0;
+var stringvar   = "Coucou";
+var vtest1      = 42;
+var vtest2      = "o\to\n";
+stringvar;
 
 // -----------------------------------------------------------------------------
 // Binop operators
@@ -20,23 +16,34 @@ else 0;
 1+10*5-1*2+1;
 1+1+10*5+1-10-10*2+1;
 
-
-
-
 var a = 5;
 var b = 10;
 a+a*b*b+b;
-//if (1=2) a else b+8;
 
 
+// -----------------------------------------------------------------------------
+// IF STATEMENTS /* o.o */
+// -----------------------------------------------------------------------------
+if(1==2)
+    if (1==1) 1
+    else 2
+else 4;
 
-function toto () 666;
-function toto_2 () 667;
+if(42==41) 41
+else if(32==43) 32
+else if(42==42) 42
+else 0;
+
+var v1 = 1;
+if(v1<0) 2;
+
+function toto() 42;
+//var vftoto = toto();
+//function toto_2 () 667;
 
 
-var c = 20;
-function toto_3() 3;
+//var c = 20;
+//function toto_3() 3;
 
 
-var d = toto();
-if (1=1) 1 else 2;
+//var d = toto();

@@ -3,9 +3,6 @@
  * Author:  Constantin
  *
  * Parser for the UdeM fjs language grammar (Functional language)
- *
- * Note:
- * This file is under heavy work and has several tmp elt / todo
  */
 
 /* ---------------------------------------------------------------------------*/
@@ -23,7 +20,7 @@
         print_string (string_of_int charpos);
         ;;
 
-    (* DEPRECATED - Return the current location *)
+    (* Return the current location *)
     let current_loc =
         let pos     = Parsing.symbol_start_pos() in
         let fname   = pos.pos_fname in
@@ -55,7 +52,7 @@
 %token <string> STR_VALUE
 %token <string> IDENTIFIER
 %token <bool> BOOLEAN
-%token PLUS MINUS STAR SLASH LT LEQ EQ
+%token PLUS MINUS STAR SLASH LT EQ
 %token LPAR RPAR LBRACET RBRACET
 %token PERIOD COMMA SEMICOLON UNDERSCORE
 %token IF ELSE VAR FUNCTION
@@ -124,6 +121,7 @@ expression:
 /* -------------------------------------------------------------------------- */
 /* If-then-else */
 /* -------------------------------------------------------------------------- */
+/* TODO: fix bug: shift/reduce and reduce/reduce here */
 if_statement:
     | IF LPAR if_test RPAR if_follow{
             Exp.If(current_loc, $3, $5, Exp.Num 0)
@@ -181,18 +179,18 @@ binop_final:
 /* Unary tests
 /* -------------------------------------------------------------------------- */
 unary_test:
-    | expression unary_test_follow {$2 $1}
+    | binop unary_test_follow {$2 $1}
 ;
 
 unary_test_follow:
-    | LEQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, [x;$2])}
+    | LT EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, [x;$3])}
     | LT expression {fun x -> Exp.PrimOp(current_loc, Exp.Lt, [x;$2])}
-    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, [x;$2])}
+    | EQ EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, [x;$3])}
 ;
 
 
 /* -------------------------------------------------------------------------- */
-/* Final elements
+/* "Final" elements
 /* -------------------------------------------------------------------------- */
 number_value:
     | INT_VALUE {Exp.Num $1}
@@ -215,18 +213,13 @@ boolean:
 /* Variables */
 /* -------------------------------------------------------------------------- */
 variable_declaration:
-    /* TODO: To clean */
     | variable_declaration_element SEMICOLON expression {Exp.Let([$1],$3)}
     | variable_declaration_element SEMICOLON declaration {Exp.Let([$1],$3)}
-    /*
-    | variable_declaration_list COMMA expression SEMICOLON {Exp.Let($1,$3)}
-    | variable_declaration_list {Exp.Let($1, Exp.Num 0)}
-    */
 ;
 
+/* TODO: Not used atm, should be for var a=1, b=2; */
 variable_declaration_list:
-    | variable_declaration_element {[$1]}
-    | variable_declaration_list SEMICOLON variable_declaration_element {$1@[$3]}
+    | variable_declaration_element COMMA variable_declaration_list {$1::[]}
 ;
 
 variable_declaration_element:

@@ -72,7 +72,6 @@ rule token = parse
     | '/'           {SLASH}
     | '<'           {LT}
     | '='           {EQ}
-    | "<="          {LEQ}
 
     (* elements / punctuation *)
     | '('           {LPAR}
@@ -169,7 +168,6 @@ rule token = parse
         | STAR          -> print_token "STAR"; debug_iter_tokens lexbuf
         | SLASH         -> print_token "SLASH"; debug_iter_tokens lexbuf
         | LT            -> print_token "LT"; debug_iter_tokens lexbuf
-        | LEQ           -> print_token "LEQ"; debug_iter_tokens lexbuf
         | EQ            -> print_token "EQ"; debug_iter_tokens lexbuf
 
         | LPAR          -> print_token "LPAR"; debug_iter_tokens lexbuf
