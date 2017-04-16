@@ -213,17 +213,17 @@ boolean:
 /* Variables */
 /* -------------------------------------------------------------------------- */
 variable_declaration:
-    | variable_declaration_element SEMICOLON expression {Exp.Let([$1],$3)}
-    | variable_declaration_element SEMICOLON declaration {Exp.Let([$1],$3)}
+    | VAR variable_declaration_list SEMICOLON expression {Exp.Let($2,$4)}
+    | VAR variable_declaration_list SEMICOLON declaration {Exp.Let($2,$4)}
 ;
 
-/* TODO: Not used atm, should be for var a=1, b=2; */
 variable_declaration_list:
-    | variable_declaration_element COMMA variable_declaration_list {$1::[]}
+    | variable_declaration_element {[$1]}
+    | variable_declaration_element COMMA variable_declaration_list {[$1]@$3}
 ;
 
 variable_declaration_element:
-    | VAR identifier EQ expression {($2,$4)}
+    | identifier EQ expression {($1,$3)}
 ;
 
 variable_get:

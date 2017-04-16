@@ -7,6 +7,7 @@
 var stringvar   = "Coucou";
 var vtest1      = 42;
 var vtest2      = "o\to\n";
+var vt1 = 1, vt2 = 2, vt3 = 3; //Not supported yet
 stringvar;
 
 // -----------------------------------------------------------------------------
@@ -38,7 +39,9 @@ var v1 = 1;
 if(v1<0) 2;
 
 function toto() 42;
+//toto();
 //var vftoto = toto();
+
 //function toto_2 () 667;
 
 
