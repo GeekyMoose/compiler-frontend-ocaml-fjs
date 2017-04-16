@@ -148,23 +148,43 @@ if_test:
 
 
 /* -------------------------------------------------------------------------- */
-/* Numbers / String / Operators / IDs
+/* Binop operations
 /* -------------------------------------------------------------------------- */
-unary_test:
-    /* TODO: resolve conflicts + type */
-    | expression LEQ expression {Exp.PrimOp(current_loc, Exp.Leq, $1::$3::[])}
-    | expression LT expression {Exp.PrimOp(current_loc, Exp.Lt, $1::$3::[])}
-    | expression EQ expression {Exp.PrimOp(current_loc, Exp.Eq, $1::$3::[])}
+binop:
+    | binop PLUS binop_2 {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
+    | binop MINUS binop_2 {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
+    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, $2::[])}
+    | binop_2 {$1}
 ;
 
-binop:
-    /* TODO: resolve shitf/reduce conflicts + type */
-    | expression PLUS expression {Exp.PrimOp(current_loc, Exp.Add, $1::$3::[])}
-    | expression MINUS expression {Exp.PrimOp(current_loc, Exp.Sub, $1::$3::[])}
-    | expression STAR expression {Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
-    | expression SLASH expression {Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
-    | MINUS expression {Exp.PrimOp(current_loc, Exp.Neg, [$2])}
+binop_2:
+    | binop_2 STAR binop_final{Exp.PrimOp(current_loc, Exp.Mul, $1::$3::[])}
+    | binop_2 SLASH binop_final{Exp.PrimOp(current_loc, Exp.Div, $1::$3::[])}
 ;
+
+binop_final:
+    | expression {$1}
+;
+
+
+/* -------------------------------------------------------------------------- */
+/* Unary tests
+/* -------------------------------------------------------------------------- */
+unary_test:
+    | expression unary_test_follow {$2 $1}
+;
+
+unary_test_follow:
+    | LEQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Leq, x::$2::[])}
+    | LT expression {fun x -> Exp.PrimOp(current_loc, Exp.Lt, x::$2::[])}
+    | EQ expression {fun x -> Exp.PrimOp(current_loc, Exp.Eq, x::$2::[])}
+;
+
+
+/* -------------------------------------------------------------------------- */
+/* Numbers / String / Operators / IDs
+/* -------------------------------------------------------------------------- */
+
 
 number_value:
     | INT_VALUE {Exp.Num $1}
