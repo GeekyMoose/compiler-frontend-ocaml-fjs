@@ -1,4 +1,5 @@
 open Printf
+open Error
 module P = Parser
 module E = Exp
 
@@ -21,7 +22,7 @@ let eval_exp expression =
     try
         let value = E.eval E.env_init expression in
         print_string ("Result = " ^ (E.vprint value) ^ "\n")
-    with E.Error ((file, line, col), name)
+    with Error ((file, line, col), name)
         -> print_string (file
                         ^":"^string_of_int line
                         ^":"^string_of_int col
@@ -35,29 +36,7 @@ let rec eval_all_exp = function
 
 
 (* ---------------------------------------------------------------------------*)
-(* Print a location *)
-let print_location (fname, lineno, charpos) = 
-    print_string fname;
-    print_string " / ";
-    print_string (string_of_int lineno);
-    print_string " / ";
-    print_string (string_of_int charpos);
-    ;;
-
-(* Print expression error *)
-let print_exp_error loc msg = 
-    print_string "[ERR] ";
-    print_location loc;
-    print_string ": ";
-    print_endline msg;;
-
-let print_parser_err lexbuf =
-    let loc     = Lexer.lexbuf_curr_loc lexbuf in
-    let str     = Lexing.lexeme lexbuf in
-    let errmsg  = "Parser error around token "^str in
-    print_exp_error loc errmsg;;
-
-
+(* Main executin *)
 (* ---------------------------------------------------------------------------*)
 let debug_mode() =
     print_endline "\n----- DEBUG PARSE -----";
@@ -85,7 +64,7 @@ let parser_mode() =
     with
         | Parsing.Parse_error ->
             print_parser_err lexbuf
-        | Exp.Error (loc,msg) ->
+        | Error (loc,msg) ->
             print_exp_error loc msg
     ;;
 

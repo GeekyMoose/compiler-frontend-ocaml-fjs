@@ -4,7 +4,7 @@ OCAMLY = ocamlyacc
 OCAMLL = ocamllex
 RM = rm
 TARGET = fjs-parser
-OBJS = exp.cmo parser.cmo lexer.cmo main.cmo
+OBJS = error.cmo exp.cmo parser.cmo lexer.cmo main.cmo
 
 FLAGS_YACC=-v
 FLAGS_OC=

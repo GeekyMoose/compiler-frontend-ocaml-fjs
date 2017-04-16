@@ -9,39 +9,7 @@
 /* HEADER SECTION */
 /* ---------------------------------------------------------------------------*/
 %{
-    open Printf
-    open Lexing
-
-    let print_location (fname, lineno, charpos) =
-        print_string fname;
-        print_string " / ";
-        print_string (string_of_int lineno);
-        print_string " / ";
-        print_string (string_of_int charpos);
-        ;;
-
-    (* Return the current location *)
-    let current_loc =
-        let pos     = Parsing.symbol_start_pos() in
-        let fname   = pos.pos_fname in
-        let lineno  = pos.pos_lnum in
-        let charpos = pos.pos_cnum - pos.pos_bol in
-        (fname, lineno, charpos);;
-
-    (* Called by the parser function on error *)
-    let parse_error msg = 
-        flush stdout;;
-
-    (* Print error *)
-    let print_error loc msg =
-        print_string "[ERR] ";
-        print_location loc;
-        print_string ": Parse error: ";
-        print_endline msg;;
-        flush stdout;;
-
-    (* Identity function *)
-    let identity = fun x -> x;;
+    open Error;;
 %}
 
 

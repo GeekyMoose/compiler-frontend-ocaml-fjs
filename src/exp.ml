@@ -1,12 +1,13 @@
 (*
  * File given by "Stephan Monnier" for this Work
- * Define the language Grammar
+ * Define the FJS language Grammar
  *)
+
+open Error;;
 
 (* exp.ml  --  Représentation à la fin du frontend.  *)
 
 (* Représentation des identificateurs.  *)
-type location = string * int * int  (* Pour contenir: (File, Line, Col).  *)
 type id = location * string
 
 (* Opérations primitives.  *)
@@ -28,9 +29,6 @@ type exp =
 (***************************************************************************)
 (****                   Interpréteur simpl(ist)e                        ****)
 (***************************************************************************)
-
-exception Error of (location * string)
-
 type value =
   | Vnum of int
   | Vbool of bool
